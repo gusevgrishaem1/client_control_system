@@ -99,6 +99,32 @@ public class Cashbox {
 	public void setTaxationSystem(TaxationSystem taxationSystem) {
 		this.taxationSystem = taxationSystem;
 	}
+
+	public FiscalDataOperatorAgreement getFiscalDataOperatorAgreement() {
+		return fiscalDataOperatorAgreement;
+	}
+
+	public void setFiscalDataOperatorAgreement(FiscalDataOperatorAgreement fiscalDataOperatorAgreement) {
+		this.fiscalDataOperatorAgreement = fiscalDataOperatorAgreement;
+	}
+
+	public FiscalMemory getFiscalMemory() {
+		return fiscalMemory;
+	}
+
+	public void setFiscalMemory(FiscalMemory fiscalMemory) {
+		this.fiscalMemory = fiscalMemory;
+	}
+
+	public Firmware getFirmware() {
+		return firmware;
+	}
+
+	public void setFirmware(Firmware firmware) {
+		this.firmware = firmware;
+	}
+	
+	
 	
 	
 }

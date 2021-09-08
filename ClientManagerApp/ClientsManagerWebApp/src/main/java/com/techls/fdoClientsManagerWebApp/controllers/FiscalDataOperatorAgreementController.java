@@ -9,11 +9,16 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import com.techls.fdoClientsManagerWebApp.entities.FiscalDataOperatorAgreement;
+import com.techls.fdoClientsManagerWebApp.services.CashboxService;
 import com.techls.fdoClientsManagerWebApp.services.FiscalDataOperatorAgreementService;
 import com.techls.fdoClientsManagerWebApp.services.FiscalDataOperatorService;
 
 @Controller
 public class FiscalDataOperatorAgreementController {
+	
+	//test
+	@Autowired
+	private CashboxService cashboxService;
 	
 	@Autowired
 	private FiscalDataOperatorAgreementService fiscalDataOperatorAgreementService;
@@ -21,20 +26,25 @@ public class FiscalDataOperatorAgreementController {
 	@Autowired
 	private FiscalDataOperatorService fiscalDataOperatorService;
 	
+	//test
 	@GetMapping("/fiscalDataOperatorAgreements")
 	public String getAll(Model model) {
-		model.addAttribute("listFiscalDataOperatorAgreements", fiscalDataOperatorAgreementService.getAll());
+		//test
+		model.addAttribute("listFiscalDataOperatorAgreements", cashboxService.getAll());
 		model.addAttribute("clientName", new String());
+		model.addAttribute("msg", new String("Без передачи"));
 		return "list_fiscal_data_operator_agreement";
 	}
 	
+	//test
 	@GetMapping("/fiscalDataOperatorAgreements/oneMonth")
 	public String getByDeactivationDateOneMonth(Model model) {
-		model.addAttribute("listFiscalDataOperatorAgreements", fiscalDataOperatorAgreementService.getByDeactivationDateLessThan(LocalDate.now().plusDays(30)));
+		model.addAttribute("listFiscalDataOperatorAgreements", cashboxService.getAllCashboxWithFiscalDataOperatorAgreementDeactivationDateLessThan(LocalDate.now().plusDays(30)));
 		model.addAttribute("clientName", new String());
 		return "list_fiscal_data_operator_agreement";
 	}
 	
+	//test
 	@GetMapping("/fiscalDataOperatorAgreements/twoMonths")
 	public String getByDeactivationDateTwoMonths(Model model) {
 		model.addAttribute("listFiscalDataOperatorAgreements", fiscalDataOperatorAgreementService.getByDeactivationDateLessThan(LocalDate.now().plusDays(60)));
@@ -42,6 +52,7 @@ public class FiscalDataOperatorAgreementController {
 		return "list_fiscal_data_operator_agreement";
 	}
 	
+	//test
 	@PostMapping("/fiscalDataOperatorAgreements/byClientName")
 	public String getByClientName(@ModelAttribute("clientName") String clientName, Model model) {
 		model.addAttribute("listFiscalDataOperatorAgreements", fiscalDataOperatorAgreementService.getByClientName(clientName));

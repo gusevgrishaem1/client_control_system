@@ -1,5 +1,6 @@
 package com.techls.fdoClientsManagerWebApp.services;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.techls.fdoClientsManagerWebApp.entities.Cashbox;
@@ -17,4 +18,8 @@ public interface CashboxService {
 	public List<Cashbox> getAll();
 	
 	public List<Cashbox> getAllByIdClient(long idClient);
+	
+	public List<Cashbox> getAllCashboxWithFiscalDataOperatorAgreement();
+	
+	public List<Cashbox> getAllCashboxWithFiscalDataOperatorAgreementDeactivationDateLessThan(LocalDate date);
 }

@@ -17,3 +17,4 @@ public interface FiscalDataOperatorAgreementRepository extends JpaRepository<Fis
 	public List<FiscalDataOperatorAgreement> findByClientName(@Param("clientName") String clientName);
 }
 
+ 

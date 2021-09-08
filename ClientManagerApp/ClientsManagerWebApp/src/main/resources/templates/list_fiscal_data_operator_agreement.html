@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"  />
     <title>Контроль ОФД</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link th:href="@{/main.css}"  type ="text/css" rel="stylesheet">
@@ -38,6 +38,8 @@
     </div>
     <div class="list-buttons">
       <a class="btn btn-primary" th:href="@{/fiscalDataOperatorAgreements}" role="button">Все</a>
+      <a class="btn btn-primary" th:href="@{/fiscalDataOperatorAgreements}" role="button">C передачей данных</a>
+      <a class="btn btn-primary" th:href="@{/fiscalDataOperatorAgreements}" role="button">Без передачи данных</a>
       <a class="btn btn-primary" th:href="@{/fiscalDataOperatorAgreements/oneMonth}" role="button"><30 дней</a>
       <a class="btn btn-primary" th:href="@{/fiscalDataOperatorAgreements/twoMonths}" role="button"><60 дней</a>
     </div>
@@ -64,9 +66,11 @@
           </tr>
         </thead>
         <tbody>
+        
                      <tr th:if="${listFiscalDataOperatorAgreements.empty}">
             <th colspan="7" class = "h1-myclass"><h3> Нет записей:( </h3></th>
         </tr>
+        <!--  
         <tr th:each="fiscalDataOperatorAgreement : ${listFiscalDataOperatorAgreements}" >
         	<th th:text="${fiscalDataOperatorAgreementStat.index + 1}"> </th>
         	<th th:text="${fiscalDataOperatorAgreement.cashbox.client.name}"> </th>
@@ -76,6 +80,18 @@
             <th th:text="${#temporals.format(fiscalDataOperatorAgreement.deactivationDate, 'dd-MM-yyyy')}"> </th>
             <th>
               <a class="btn btn-primary" th:href="@{/clients/clientEditor/{idClient}/cashboxEditor/{idCashbox}(idClient=${fiscalDataOperatorAgreement.cashbox.client.id}, idCashbox=${fiscalDataOperatorAgreement.cashbox.id})}" role="button">Редактор кассы</a>
+            </th>
+          </tr>
+          -->
+                  <tr th:each="cashbox : ${listFiscalDataOperatorAgreements}" >
+        	<th th:text="${cashboxStat.index + 1}"> </th>
+        	<th th:text="${cashbox.client.name}"> </th>
+            <th th:text="${cashbox.cashboxModel.name}"> </th>
+            <th th:text="${cashbox.installationAddress}"> </th>
+            <th th:text="${cashbox.factoryNumber}"> </th>
+            <th lang="ru" th:text="${cashbox.fiscalDataOperatorAgreement==null} ? ${msg} : ${#temporals.format(cashbox.fiscalDataOperatorAgreement.deactivationDate, 'dd-MM-yyyy')}" > </th>
+            <th>
+              <a class="btn btn-primary" th:href="@{/clients/clientEditor/{idClient}/cashboxEditor/{idCashbox}(idClient=${cashbox.client.id}, idCashbox=${cashbox.id})}" role="button">Редактор кассы</a>
             </th>
           </tr>
         </tbody>

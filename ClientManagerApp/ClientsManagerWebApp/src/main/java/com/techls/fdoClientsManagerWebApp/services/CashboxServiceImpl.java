@@ -1,7 +1,9 @@
 package com.techls.fdoClientsManagerWebApp.services;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.techls.fdoClientsManagerWebApp.entities.Cashbox;
 import com.techls.fdoClientsManagerWebApp.repositories.CashboxRepository;
@@ -46,6 +48,16 @@ public class CashboxServiceImpl implements CashboxService {
 	@Override
 	public Cashbox update(Cashbox cashbox) {
 		return cashboxRepository.save(cashbox);
+	}
+
+	@Override
+	public List<Cashbox> getAllCashboxWithFiscalDataOperatorAgreement() {
+		return cashboxRepository.findByFiscalDataOperatorAgreementNull();
+	}
+
+	@Override
+	public List<Cashbox> getAllCashboxWithFiscalDataOperatorAgreementDeactivationDateLessThan(LocalDate date) {
+		return cashboxRepository.findByFiscalDataOperatorAgreementDeactivationDate(date);
 	}
 	
 	
