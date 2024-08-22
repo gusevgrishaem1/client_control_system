@@ -1,383 +1,290 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Управление клиентами</title>
+    <title>Client Table</title>
+    <!-- Подключение стилей Tabulator -->
+    <link href="https://unpkg.com/tabulator-tables@5.6.0/dist/css/tabulator.min.css" rel="stylesheet">
+    <!-- Подключение основного файла Tabulator -->
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.6.0/dist/js/tabulator.min.js"></script>
     <style>
+        /* Общие стили для страницы */
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #ff7e5f, #feb47b); /* Градиентный фон */
-            color: #333;
+            background-color: #f5f5f5;
             margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background-color: #fff;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 800px;
-            overflow: hidden;
         }
-        h2 {
+
+        h1 {
             text-align: center;
             color: #333;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: auto; /* Автоматическая ширина столбцов */
-        }
-        th, td {
-            padding: 8px;
-            border: 1px solid #ddd;
-            text-align: left;
-            overflow: hidden; /* Обрезка длинного текста */
-            text-overflow: ellipsis;
-            white-space: nowrap; /* Текст в одну строку */
-        }
-        th {
-            cursor: pointer;
-            resize: horizontal; /* Возможность изменения ширины */
-            background-color: #f4f4f4;
-        }
-        th.sort-asc::after {
-            content: " ▲";
-        }
-        th.sort-desc::after {
-            content: " ▼";
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .pagination {
-            margin-top: 10px;
+
+        /* Контейнер для таблицы и формы */
+        #controls {
+            margin: 20px auto;
+            max-width: 1000px;
             text-align: center;
         }
-        .pagination button {
-            margin: 0 5px;
-            padding: 5px 10px;
-            cursor: pointer;
-            background-color: #4CAF50;
-            color: white;
+
+        #client-table {
+            margin: 20px auto;
+            max-width: 1000px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #fff;
+        }
+
+        /* Стили для формы добавления и редактирования */
+        #client-form {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        #client-form input {
+            width: calc(25% - 10px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #client-form button {
+            padding: 10px 20px;
             border: none;
-            border-radius: 4px;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
         }
-        .pagination button:hover {
-            background-color: #45a049;
+
+        #client-form button:hover {
+            background-color: #218838;
         }
-        .pagination button:disabled {
-            background-color: #ddd;
-            cursor: not-allowed;
-        }
-        .save-button, .cancel-button {
+
+        /* Кнопки подтверждения и отмены */
+        #save-button, #cancel-button {
             display: none;
             margin-top: 10px;
             padding: 10px 20px;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #save-button {
+            background-color: #007bff;
+        }
+
+        #save-button:hover {
+            background-color: #0056b3;
+        }
+
+        #cancel-button {
+            background-color: #dc3545;
+        }
+
+        #cancel-button:hover {
+            background-color: #c82333;
+        }
+
+        #action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tabulator-edit-button, .tabulator-delete-button {
+            background-color: #007bff;
             color: white;
             border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
             cursor: pointer;
-            border-radius: 4px;
         }
-        .save-button {
-            background-color: #4CAF50;
+
+        .tabulator-edit-button:hover, .tabulator-delete-button:hover {
+            background-color: #0056b3;
         }
-        .save-button:hover {
-            background-color: #45a049;
+
+        .tabulator-delete-button {
+            background-color: #dc3545;
         }
-        .cancel-button {
-            background-color: #f44336;
+
+        .tabulator-delete-button:hover {
+            background-color: #c82333;
         }
-        .cancel-button:hover {
-            background-color: #e53935;
-        }
-        .filter-container {
-            margin-bottom: 10px;
-        }
-        .filter-container input {
-            width: 100%;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box; /* Включает padding в ширину элемента */
-        }
-        .filter-container th, .filter-container td {
-            padding: 0;
-            border: none;
-        }
-        #addClientForm {
-            margin-bottom: 20px;
-        }
-        #addClientForm input {
-            margin-bottom: 10px;
+
+        .tabulator-edit-button {
+            margin-right: 5px;
         }
     </style>
-    <link href="https://unpkg.com/tabulator-tables@5.6.0/dist/css/tabulator.min.css" rel="stylesheet">
-    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.6.0/dist/js/tabulator.min.js"></script>
 </head>
 <body>
 
-<div class="container">
-    <h2>Управление клиентами</h2>
+<!-- Заголовок страницы -->
+<h1>Список Клиентов</h1>
 
-    <div id="addClientForm">
-        <h3>Добавить нового клиента</h3>
-        <input type="text" id="newInn" placeholder="ИНН" required/>
-        <input type="text" id="newTitle" placeholder="Название" required/>
-        <input type="tel" id="newTelephone" placeholder="Телефон" required/>
-        <button onclick="addClient()">Добавить клиента</button>
-    </div>
-
-    <table id="clientTable">
-        <thead>
-        <tr>
-            <th style="width: 10%;" onclick="sortCurrentPage(0)">ID</th>
-            <th style="width: 25%;" onclick="sortCurrentPage(1)">ИНН</th>
-            <th style="width: 35%;" onclick="sortCurrentPage(2)">Название</th>
-            <th style="width: 30%;" onclick="sortCurrentPage(3)">Телефон</th>
-        </tr>
-        <tr class="filter-container">
-            <td><input type="text" id="filterId" onkeyup="filterTable()" placeholder="Поиск по ID..."></td>
-            <td><input type="text" id="filterInn" onkeyup="filterTable()" placeholder="Поиск по ИНН..."></td>
-            <td><input type="text" id="filterTitle" onkeyup="filterTable()" placeholder="Поиск по названию..."></td>
-            <td><input type="text" id="filterTelephone" onkeyup="filterTable()" placeholder="Поиск по телефону..."></td>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- Клиенты будут добавляться сюда -->
-        </tbody>
-    </table>
-
-    <button class="save-button" id="saveButton" onclick="saveChanges()">Сохранить</button>
-    <button class="cancel-button" id="cancelButton" onclick="cancelChanges()">Отмена</button>
-
-    <div class="pagination">
-        <button id="prevButton" onclick="prevPage()">Предыдущая</button>
-        <span id="pageInfo"></span>
-        <button id="nextButton" onclick="nextPage()">Следующая</button>
+<!-- Форма добавления и редактирования клиента -->
+<div id="controls">
+    <form id="client-form">
+        <input type="text" id="inn" placeholder="ИНН" required>
+        <input type="text" id="title" placeholder="Название" required>
+        <input type="text" id="telephone" placeholder="Телефон" required>
+        <button type="submit">Добавить</button>
+    </form>
+    <div id="action-buttons">
+        <button id="save-button">Подтвердить</button>
+        <button id="cancel-button">Отмена</button>
     </div>
 </div>
 
+<!-- Контейнер для таблицы -->
+<div id="client-table"></div>
+
 <script>
-    // Параметры пагинации
-    const apiUrl = 'http://localhost:8080';
-    let currentPage = 1;
-    const rowsPerPage = 5; // Количество строк на странице
-    let currentSortColumn = null;
-    let currentSortDirection = 'asc';
-    let filters = {
-        id: '',
-        inn: '',
-        title: '',
-        telephone: ''
-    };
+    function generateRandomClientData(num) {
+        const clients = [];
+        const generateRandomPhone = () => `+7 999 ${Math.floor(Math.random() * 1000)}-${Math.floor(Math.random() * 100)}-${Math.floor(Math.random() * 100)}`;
+        const generateRandomINN = () => `${Math.floor(Math.random() * 10000000000)}`;
+        const generateRandomTitle = () => `Компания ${Math.floor(Math.random() * 10000)}`;
 
-    let editedCells = new Map();
-
-    function markCellAsEdited(clientId, field, value) {
-        if (!editedCells.has(clientId)) {
-            editedCells.set(clientId, {});
-        }
-        editedCells.get(clientId)[field] = value;
-        document.getElementById('saveButton').style.display = 'inline-block';
-        document.getElementById('cancelButton').style.display = 'inline-block';
-    }
-
-    async function loadTableData() {
-        // Функция для фильтрации пустых значений
-        function filterEmptyParams(params) {
-            const filteredParams = {};
-            for (const key in params) {
-                if (params[key]) {
-                    filteredParams[key] = params[key];
-                }
-            }
-            return filteredParams;
-        }
-
-        // Определяем параметры запроса
-        const queryParams = {
-            id: filters.id,
-            inn: filters.inn,
-            title: filters.title,
-            telephone: filters.telephone,
-            sortColumn: currentSortColumn || '',
-            sortDirection: currentSortDirection || '',
-            page: currentPage - 1,
-            size: rowsPerPage
-        };
-
-        // Фильтруем пустые параметры
-        const filteredParams = filterEmptyParams(queryParams);
-
-        // Создаем строку запроса
-        const queryString = new URLSearchParams(filteredParams).toString();
-
-        // Выполняем запрос
-        const response = await fetch(`${apiUrl}/api/clients?${queryString}`);
-        const result = await response.json();
-
-        // Отображаем данные
-        displayTable(result.content, result.totalElements);
-
-        // Управление кнопками пагинации
-        document.getElementById('prevButton').disabled = currentPage === 1;
-        document.getElementById('nextButton').disabled = result.content.length < rowsPerPage;
-    }
-
-    function displayTable(clients, totalCount) {
-        const tableBody = document.getElementById('clientTable').getElementsByTagName('tbody')[0];
-        tableBody.innerHTML = '';
-
-        clients.forEach((client) => {
-            const row = tableBody.insertRow();
-            row.insertCell(0).textContent = client.id;
-            row.insertCell(1).innerHTML = `<input type="text" value="${client.inn}" onchange="markCellAsEdited(${client.id}, 'inn', this.value)" />`;
-            row.insertCell(2).innerHTML = `<input type="text" value="${client.title}" onchange="markCellAsEdited(${client.id}, 'title', this.value)" />`;
-            row.insertCell(3).innerHTML = `<input type="tel" value="${client.telephone}" onchange="markCellAsEdited(${client.id}, 'telephone', this.value)" />`;
-            row.insertCell(4).innerHTML = `<button class="delete-button" onclick="deleteClient(${client.id})">Удалить</button>`; // Кнопка удаления
-        });
-
-        document.getElementById('pageInfo').textContent = `Страница ${currentPage} из ${Math.ceil(totalCount / rowsPerPage)}`;
-    }
-
-    function nextPage() {
-        currentPage++;
-        loadTableData();
-    }
-
-    function prevPage() {
-        if (currentPage > 1) {
-            currentPage--;
-            loadTableData();
-        }
-    }
-
-    function sortCurrentPage(columnIndex) {
-        const columns = ['id', 'inn', 'title', 'telephone'];
-        currentSortColumn = columns[columnIndex];
-        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
-        loadTableData();
-    }
-
-    function filterTable() {
-        filters.id = document.getElementById("filterId").value.trim();
-        filters.inn = document.getElementById("filterInn").value.trim();
-        filters.title = document.getElementById("filterTitle").value.trim();
-        filters.telephone = document.getElementById("filterTelephone").value.trim();
-
-        currentPage = 1;
-        loadTableData();
-    }
-
-    async function saveChanges() {
-        if (editedCells.size === 0) return;
-
-        // Сначала получаем текущее состояние всех клиентов
-        const currentClients = await Promise.all(Array.from(editedCells.keys()).map(id =>
-            fetch(`${apiUrl}/api/clients?id=${id}`).then(response => response.json())
-        ));
-
-        // Обновляем данные с учетом изменений
-        const clientsToUpdate = currentClients.map(client => {
-            client = client.content[0]
-            const updates = editedCells.get(client.id) || {};
-            return {
-                id: client.id,
-                inn: updates.inn !== undefined ? updates.inn : client.inn,
-                title: updates.title !== undefined ? updates.title : client.title,
-                telephone: updates.telephone !== undefined ? updates.telephone : client.telephone
-            };
-        });
-
-        const response = await fetch(`${apiUrl}/api/clients`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(clientsToUpdate)
-        });
-
-        if (response.ok) {
-            alert('Изменения успешно сохранены!');
-            editedCells.clear();
-            document.getElementById('saveButton').style.display = 'none';
-            document.getElementById('cancelButton').style.display = 'none';
-            loadTableData();
-        } else {
-            alert('Произошла ошибка при сохранении изменений.');
-        }
-    }
-
-    function cancelChanges() {
-        if (confirm("Вы уверены, что хотите отменить все несохранённые изменения?")) {
-            editedCells.clear();
-            document.getElementById('saveButton').style.display = 'none';
-            document.getElementById('cancelButton').style.display = 'none';
-            loadTableData(); // Перезагружаем данные с сервера
-        }
-    }
-
-    async function addClient() {
-        const newInn = document.getElementById('newInn').value.trim();
-        const newTitle = document.getElementById('newTitle').value.trim();
-        const newTelephone = document.getElementById('newTelephone').value.trim();
-
-        if (!newInn || !newTitle || !newTelephone) {
-            alert('Пожалуйста, заполните все поля.');
-            return;
-        }
-
-        const newClient = {
-            inn: newInn,
-            title: newTitle,
-            telephone: newTelephone
-        };
-
-        const response = await fetch(`${apiUrl}/api/clients`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(newClient)
-        });
-
-        if (response.ok) {
-            alert('Клиент успешно добавлен!');
-            document.getElementById('newInn').value = '';
-            document.getElementById('newTitle').value = '';
-            document.getElementById('newTelephone').value = '';
-            loadTableData(); // Обновляем таблицу
-        } else {
-            alert('Произошла ошибка при добавлении клиента.');
-        }
-    }
-
-
-    async function deleteClient(clientId) {
-        if (confirm("Вы уверены, что хотите удалить этого клиента?")) {
-            const response = await fetch(`${apiUrl}/api/clients?id=${clientId}`, {
-                method: 'DELETE'
+        for (let i = 0; i < num; i++) {
+            clients.push({
+                id: i + 1,
+                inn: generateRandomINN(),
+                title: generateRandomTitle(),
+                telephone: generateRandomPhone(),
             });
-
-            if (response.ok) {
-                alert('Клиент успешно удален!');
-                loadTableData();
-            } else {
-                alert('Произошла ошибка при удалении клиента.');
-            }
         }
+        return clients;
     }
 
-    // Начальная загрузка данных
-    loadTableData();
+    var clientData = generateRandomClientData(100); // Генерация 100 записей
 
+    var originalData = {}; // Объект для хранения оригинальных данных
+    var editedRowId = null; // ID редактируемой строки
+
+    // Инициализация таблицы
+    var table = new Tabulator("#client-table", {
+        data: clientData,
+        layout: "fitColumns",
+        columns: [
+            {title: "ID", field: "id", hozAlign: "center", width: 70, headerFilter: "input"},
+            {title: "ИНН", field: "inn", hozAlign: "center", editor: "input", width: 150, headerFilter: "input"},
+            {title: "Название", field: "title", editor: "input", width: 350, headerFilter: "input"},
+            {title: "Телефон", field: "telephone", hozAlign: "center", editor: "input", width: 150, headerFilter: "input"},
+            {
+                title: "Действия",
+                formatter: function(cell, formatterParams, onRendered) {
+                    return `<button class="tabulator-edit-button">Редактировать</button>
+                            <button class="tabulator-delete-button">Удалить</button>`;
+                },
+                width: 300,
+                hozAlign: "center",
+                cellClick: function(e, cell) {
+                    var button = e.target;
+                    if (button.classList.contains("tabulator-edit-button")) {
+                        // Обработка кнопки редактирования
+                        startEditing(cell.getRow());
+                    } else if (button.classList.contains("tabulator-delete-button")) {
+                        // Обработка кнопки удаления
+                        if (confirm("Вы уверены, что хотите удалить эту запись?")) {
+                            cell.getRow().delete();
+                        }
+                    }
+                }
+            },
+        ],
+        addRowPos: "top",
+    });
+
+    // Функция для начала редактирования строки
+    function startEditing(row) {
+        var rowData = row.getData();
+        document.getElementById("inn").value = rowData.inn;
+        document.getElementById("title").value = rowData.title;
+        document.getElementById("telephone").value = rowData.telephone;
+        editedRowId = rowData.id;
+        originalData = {...rowData};
+        document.getElementById("save-button").style.display = "inline-block";
+        document.getElementById("cancel-button").style.display = "inline-block";
+    }
+
+    // Функция подтверждения изменений
+    document.getElementById("save-button").addEventListener("click", function () {
+        if (editedRowId !== null) {
+            var rowData = {
+                id: editedRowId,
+                inn: document.getElementById("inn").value,
+                title: document.getElementById("title").value,
+                telephone: document.getElementById("telephone").value,
+            };
+            table.updateData([rowData]); // Обновляем данные в таблице
+            hideActionButtons(); // Скрываем кнопки "Подтвердить" и "Отмена"
+            editedRowId = null;
+            document.getElementById("inn").value = '';
+            document.getElementById("title").value = '';
+            document.getElementById("telephone").value = '';
+        }
+    });
+
+    // Функция отмены изменений
+    document.getElementById("cancel-button").addEventListener("click", function () {
+        if (editedRowId !== null) {
+            table.updateData([originalData]); // Возвращаем оригинальные данные
+            hideActionButtons(); // Скрываем кнопки "Подтвердить" и "Отмена"
+            editedRowId = null;
+            document.getElementById("inn").value = '';
+            document.getElementById("title").value = '';
+            document.getElementById("telephone").value = '';
+        }
+    });
+
+    // Функция скрытия кнопок "Подтвердить" и "Отмена"
+    function hideActionButtons() {
+        document.getElementById("save-button").style.display = "none";
+        document.getElementById("cancel-button").style.display = "none";
+    }
+
+    // Функция добавления нового клиента
+    document.getElementById("client-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        var inn = document.getElementById("inn").value;
+        var title = document.getElementById("title").value;
+        var telephone = document.getElementById("telephone").value;
+
+        if (editedRowId === null) {
+            // Добавление нового клиента
+            table.addRow({
+                id: clientData.length + 1,
+                inn: inn,
+                title: title,
+                telephone: telephone
+            });
+        } else {
+            // Обновление существующего клиента
+            var rowData = {
+                id: editedRowId,
+                inn: inn,
+                title: title,
+                telephone: telephone,
+            };
+            table.updateData([rowData]);
+            editedRowId = null; // Сброс ID редактируемой строки
+        }
+
+        // Очистка формы
+        document.getElementById("inn").value = '';
+        document.getElementById("title").value = '';
+        document.getElementById("telephone").value = '';
+        hideActionButtons(); // Скрываем кнопки "Подтвердить" и "Отмена"
+    });
 </script>
 
 </body>

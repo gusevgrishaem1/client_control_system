@@ -77,5 +77,6 @@ public class CashRegister {
     private String version;
 
     @Column(name = "os_install_date")
-}
     private LocalDate installationDate;
+}
+
