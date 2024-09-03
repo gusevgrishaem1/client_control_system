@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "ofd")
+@Table(name = "ofd_data")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -22,4 +22,6 @@ public class OFD {
     private String title;
     @Column(name = "inn")
     private String inn;
+    @Column(name = "pr_archive")
+    private Boolean archive;
 }

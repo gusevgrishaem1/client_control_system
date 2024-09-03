@@ -1,4 +1,4 @@
-package com.techls.ofd.repositories.clients;
+package com.techls.ofd.repositories.client;
 
 import com.techls.ofd.entities.Client;
 import org.springframework.data.jpa.repository.JpaRepository;

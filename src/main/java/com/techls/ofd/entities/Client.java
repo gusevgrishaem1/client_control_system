@@ -8,11 +8,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "client")
+@Table(name = "client_data")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+// Клиент
 public class Client {
     @Id
     @GeneratedValue
@@ -24,4 +25,6 @@ public class Client {
     private String title;
     @Column(name = "telephone")
     private String telephone;
+    @Column(name = "pr_archive")
+    private Boolean archive;
 }

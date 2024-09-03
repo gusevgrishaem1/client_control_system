@@ -7,17 +7,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
-@Table(name = "cash_register_model")
+@Table(name = "model_data")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class CashRegisterModel {
+// Модель кассы
+public class Model {
     @Id
     @GeneratedValue
     @Column(name = "id")
     private Long id;
     @Column(name = "title")
     private String title;
+    @Column(name = "pr_archive")
+    private Boolean archive;
 }

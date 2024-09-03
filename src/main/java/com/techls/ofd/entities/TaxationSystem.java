@@ -8,11 +8,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "taxation_system")
+@Table(name = "taxation_system_data")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+// Система налогооблажения
 public class TaxationSystem {
     @Id
     @GeneratedValue
@@ -20,4 +21,6 @@ public class TaxationSystem {
     private Long id;
     @Column(name = "title")
     private String title;
+    @Column(name = "pr_archive")
+    private Boolean archive;
 }

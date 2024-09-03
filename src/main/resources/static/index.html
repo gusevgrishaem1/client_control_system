@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Table</title>
+    <!-- Подключение стилей Tabulator -->
+    <link href="https://unpkg.com/tabulator-tables@5.6.0/dist/css/tabulator.min.css" rel="stylesheet">
+    <!-- Подключение основного файла Tabulator -->
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.6.0/dist/js/tabulator.min.js"></script>
+    <style>
+        /* Общие стили для страницы */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Стили для бокового меню */
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            padding-top: 20px;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+
+        /* Контейнер для основного контента */
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+        }
+
+        /* Контейнер для таблицы и формы */
+        #cash-register-table, #client-table, #model-table, #ofd-table, #taxation-system-table {
+            margin: 20px auto;
+            max-width: 1200px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #fff;
+        }
+
+        #cash-register-form, #client-form, #model-form, #ofd-form, #taxation-system-form {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        /* Стили для форм */
+        form label {
+            width: 100%;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        form input, form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        /* Стили для группы полей */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            width: calc(33.33% - 20px);
+            min-width: 200px;
+        }
+
+        /* Кнопки подтверждения и отмены */
+        #client-save-button, #client-cancel-button {
+            display: none;
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #client-save-button {
+            background-color: #007bff;
+        }
+
+        #client-save-button:hover {
+            background-color: #0056b3;
+        }
+
+        #client-cancel-button {
+            background-color: #dc3545;
+        }
+
+        #client-cancel-button:hover {
+            background-color: #c82333;
+        }
+
+        #client-action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tabulator-edit-button, .tabulator-delete-button, .tabulator-archive-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .tabulator-archive-button {
+            background-color: #4B0082;
+        }
+
+        .tabulator-edit-button:hover, .tabulator-delete-button:hover {
+            background-color: #0056b3;
+        }
+
+        .tabulator-delete-button {
+            background-color: #dc3545;
+        }
+
+        .tabulator-delete-button:hover {
+            background-color: #c82333;
+        }
+
+        .tabulator-edit-button {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Боковое меню -->
+<div class="sidebar">
+    <a data-content="clients" class="active">Клиенты</a>
+    <a data-content="cash-registers">Кассы</a>
+    <a data-content="models">Модели</a>
+    <a data-content="ofds">ОФД</a>
+    <a data-content="taxation-systems">Налоговые системы</a>
+    <a>Выход</a>
+</div>
+<div id="context-menu"
+     style="display:none; position: absolute; z-index: 1000; background-color: white; border: 1px solid #ccc; box-shadow: 2px 2px 10px rgba(0,0,0,0.1);">
+    <ul style="list-style: none; padding: 10px; margin: 0;">
+        <li id="edit-action" style="padding: 5px; cursor: pointer;">Редактировать</li>
+        <li id="delete-action" style="padding: 5px; cursor: pointer;">Удалить</li>
+    </ul>
+</div>
+<!-- Основной контент -->
+<div class="content">
+    <div id="clients" class="content-section">
+        <h1>Реестр Клиентов</h1>
+        <div id="client-controls">
+            <form id="client-form">
+                <input type="hidden" id="client-id">
+
+                <div class="form-group">
+                    <label for="client-inn">ИНН</label>
+                    <input type="text" id="client-inn" placeholder="ИНН">
+                </div>
+
+                <div class="form-group">
+                    <label for="client-title">Название</label>
+                    <input type="text" id="client-title" placeholder="Название">
+                </div>
+
+                <div class="form-group">
+                    <label for="client-telephone">Телефон</label>
+                    <input type="text" id="client-telephone" placeholder="Телефон">
+                </div>
+
+                <div id="client-action-buttons">
+                    <button id="client-save-button" type="button">Сохранить</button>
+                    <button id="client-cancel-button" type="button">Отменить</button>
+                </div>
+
+                <button id="client-add-button" type="submit">Добавить</button>
+            </form>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <button id="client-showNotArchived" type="button">Показать неархивные</button>
+            <button id="client-showArchived" type="button">Показать архивные</button>
+        </div>
+        <div id="client-table"></div>
+    </div>
+
+    <div id="cash-registers" class="content-section" style="display:none;">
+        <h1>Реестр Кассовых Аппаратов</h1>
+        <div id="cash-register-controls">
+            <form id="cash-register-form">
+                <div class="form-group">
+                    <label for="cash-client-select">Клиент</label>
+                    <select id="cash-client-select"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-model-select">Модель</label>
+                    <select id="cash-model-select"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-ofd-select">ОФД</label>
+                    <select id="cash-ofd-select"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-taxation-system-select">СНО</label>
+                    <select id="cash-taxation-system-select"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-factoryNumber">Заводской номер</label>
+                    <input type="text" id="cash-factoryNumber" placeholder="Заводской номер">
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-installationAddress">Адрес установки</label>
+                    <input type="text" id="cash-installationAddress" placeholder="Адрес установки">
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-registrationNumber">Регистрационный номер</label>
+                    <input type="text" id="cash-registrationNumber" placeholder="Регистрационный номер">
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-activationDate">Дата активации ОФД договора</label>
+                    <input type="date" id="cash-activationDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-deactivationDate">Дата деактивации ОФД договора</label>
+                    <input type="date" id="cash-deactivationDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-fiscalType">Тип фискального аппарата</label>
+                    <input type="text" id="cash-fiscalType" placeholder="Тип фискального аппарата">
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-fiscalFactoryNumber">Заводской номер ФА</label>
+                    <input type="text" id="cash-fiscalFactoryNumber" placeholder="Заводской номер ФА">
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-fiscalActivationDate">Дата активации ФА</label>
+                    <input type="date" id="cash-fiscalActivationDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-fiscalDeactivationDate">Дата деактивации ФА</label>
+                    <input type="date" id="cash-fiscalDeactivationDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-version">Версия прошивки</label>
+                    <input type="text" id="cash-version" placeholder="Версия прошивки">
+                </div>
+
+                <div class="form-group">
+                    <label for="cash-installationDate">Дата установки прошивки</label>
+                    <input type="date" id="cash-installationDate">
+                </div>
+
+                <div id="cash-action-buttons">
+                    <button id="cash-save-button" type="button">Сохранить</button>
+                    <button id="cash-cancel-button" type="button">Отменить</button>
+                </div>
+
+                <button id="cash-register-add-button" type="submit">Добавить</button>
+            </form>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <button id="cash-showNotArchived" type="button">Показать неархивные</button>
+            <button id="cash-showArchived" type="button">Показать архивные</button>
+        </div>
+        <div id="cash-register-table"></div>
+    </div>
+
+    <div id="models" class="content-section" style="display:none;">
+        <h1>Реестр Моделей</h1>
+        <div id="model-controls">
+            <form id="model-form">
+                <div class="form-group">
+                    <label for="model-title">Название модели</label>
+                    <input type="text" id="model-title" placeholder="Название модели" required>
+                </div>
+                <button type="submit">Добавить</button>
+            </form>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <button id="model-showNotArchived" type="button">Показать неархивные</button>
+            <button id="model-showArchived" type="button">Показать архивные</button>
+        </div>
+        <div id="model-table"></div>
+    </div>
+
+    <div id="ofds" class="content-section" style="display:none;">
+        <h1>Реестр ОФД</h1>
+        <div id="ofd-controls">
+            <form id="ofd-form">
+                <div class="form-group">
+                    <label for="ofd-inn">ИНН</label>
+                    <input type="text" id="ofd-inn" placeholder="ИНН" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ofd-title">Название ОФД</label>
+                    <input type="text" id="ofd-title" placeholder="Название ОФД" required>
+                </div>
+
+                <button type="submit">Добавить</button>
+            </form>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <button id="ofd-showNotArchived" type="button">Показать неархивные</button>
+            <button id="ofd-showArchived" type="button">Показать архивные</button>
+        </div>
+        <div id="ofd-table"></div>
+    </div>
+
+    <div id="taxation-systems" class="content-section" style="display:none;">
+        <h1>Реестр Налоговых Систем</h1>
+        <div id="taxation-system-controls">
+            <form id="taxation-system-form">
+                <div class="form-group">
+                    <label for="taxation-system-title">Название налоговой системы</label>
+                    <input type="text" id="taxation-system-title" placeholder="Название налоговой системы" required>
+                </div>
+                <button type="submit">Добавить</button>
+            </form>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <button id="taxation-system-showNotArchived" type="button">Показать неархивные</button>
+            <button id="taxation-system-showArchived" type="button">Показать архивные</button>
+        </div>
+        <div id="taxation-system-table"></div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -7,15 +7,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 
 @Entity
-@Table(name = "cash_register")
+@Table(name = "cash_register_data")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+// Касса клиента
 public class CashRegister {
 
     @Id
@@ -33,16 +33,16 @@ public class CashRegister {
     @Column(name = "nn_registration")
     private String registrationNumber;
 
-    @Column(name = "archive_ts")
-    private LocalDateTime archiveTs;
+    @Column(name = "pr_archive")
+    private Boolean archive;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_client")
     private Client client;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_cash_register_model")
-    private CashRegisterModel cashRegisterModel;
+    @JoinColumn(name = "id_model")
+    private Model model;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_taxation_system")
