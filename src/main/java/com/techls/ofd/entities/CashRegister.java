@@ -19,7 +19,7 @@ import java.time.LocalDate;
 public class CashRegister {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id")
     private Long id;
 

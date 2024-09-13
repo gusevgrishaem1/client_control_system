@@ -11,6 +11,8 @@ public interface ModelService {
 
     void archive(Long id);
 
+    void recover(Long id);
+
     List<Model> getAll();
 
     List<Model> getCombo();

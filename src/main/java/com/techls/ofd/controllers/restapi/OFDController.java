@@ -33,6 +33,11 @@ public class OFDController {
         ofdService.delete(id);
     }
 
+    @PutMapping("/recover")
+    public void recover(@RequestParam Long id) {
+        ofdService.recover(id);
+    }
+
     @GetMapping("/combo")
     public List<OFD> getCombo() {
         return ofdService.getCombo();

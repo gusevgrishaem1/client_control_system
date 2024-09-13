@@ -18,6 +18,7 @@ public class OFDServiceImpl implements OFDService {
     @Override
     @Transactional
     public Long create(OFD ofd) {
+        ofd.setArchive(false);
         return ofdRepository.save(ofd).getId();
     }
 
@@ -39,6 +40,23 @@ public class OFDServiceImpl implements OFDService {
         ofdRepository.findById(id).ifPresent(
                 ofd -> {
                     ofd.setArchive(true);
+                    ofdRepository.save(ofd);
+                }
+        );
+    }
+
+    @Override
+    @Transactional
+    public void recover(Long id) {
+        cashRegisterRepository.findByOfd_Id(id).forEach(
+                e -> {
+                    e.setArchive(false);
+                    cashRegisterRepository.save(e);
+                }
+        );
+        ofdRepository.findById(id).ifPresent(
+                ofd -> {
+                    ofd.setArchive(false);
                     ofdRepository.save(ofd);
                 }
         );

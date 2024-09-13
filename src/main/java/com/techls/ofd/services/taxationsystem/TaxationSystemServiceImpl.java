@@ -45,6 +45,22 @@ public class TaxationSystemServiceImpl implements TaxationSystemService {
     }
 
     @Override
+    public void recover(Long id) {
+        cashRegisterRepository.findByTaxationSystem_Id(id).forEach(
+                cashRegister -> {
+                    cashRegister.setArchive(false);
+                    cashRegisterRepository.save(cashRegister);
+                }
+        );
+        taxationSystemRepository.findById(id).ifPresent(
+                taxationSystem -> {
+                    taxationSystem.setArchive(false);
+                    taxationSystemRepository.save(taxationSystem);
+                }
+        );
+    }
+
+    @Override
     public List<TaxationSystem> getAll() {
         return taxationSystemRepository.findAll();
     }

@@ -16,7 +16,7 @@ import lombok.Setter;
 // Модель кассы
 public class Model {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id")
     private Long id;
     @Column(name = "title")

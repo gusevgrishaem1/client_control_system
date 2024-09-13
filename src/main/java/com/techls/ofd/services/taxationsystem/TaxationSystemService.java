@@ -11,6 +11,8 @@ public interface TaxationSystemService {
 
     void delete(Long id);
 
+    void recover(Long id);
+
     List<TaxationSystem> getAll();
 
     List<TaxationSystem> getCombo();

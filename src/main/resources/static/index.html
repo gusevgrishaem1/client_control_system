@@ -49,7 +49,7 @@
         .content {
             margin-left: 250px;
             padding: 20px;
-            width: calc(100% - 250px);
+            width: calc(100% - 350px);
         }
 
         /* Контейнер для таблицы и формы */
@@ -95,7 +95,11 @@
         }
 
         /* Кнопки подтверждения и отмены */
-        #client-save-button, #client-cancel-button {
+        #client-save-button, #client-cancel-button,
+        #model-cancel-button, #model-save-button,
+        #cash-cancel-button, #cash-save-button,
+        #ofd-cancel-button, #ofd-save-button,
+        #taxation-system-cancel-button, #taxation-system-save-button{
             display: none;
             margin-top: 10px;
             padding: 10px 20px;
@@ -105,23 +109,23 @@
             cursor: pointer;
         }
 
-        #client-save-button {
+        #client-save-button,  #model-save-button, #cash-save-button, #ofd-save-button, #taxation-system-save-button {
             background-color: #007bff;
         }
 
-        #client-save-button:hover {
+        #client-save-button:hover, #model-save-button:hover, #cash-save-button:hover, #ofd-save-button:hover, #taxation-system-save-button:hover {
             background-color: #0056b3;
         }
 
-        #client-cancel-button {
+        #client-cancel-button, #model-cancel-button, #cash-cancel-button, #ofd-cancel-button, #taxation-system-cancel-button {
             background-color: #dc3545;
         }
 
-        #client-cancel-button:hover {
+        #client-cancel-button:hover, #model-cancel-button:hover, #cash-cancel-button:hover, #ofd-cancel-button:hover, #taxation-system-cancel-button:hover {
             background-color: #c82333;
         }
 
-        #client-action-buttons {
+        #client-action-buttons, #model-action-buttons, #cash-action-buttons, #ofd-action-buttons, #taxation-system-action-buttons {
             display: flex;
             justify-content: center;
             gap: 10px;
@@ -315,7 +319,11 @@
                     <label for="model-title">Название модели</label>
                     <input type="text" id="model-title" placeholder="Название модели" required>
                 </div>
-                <button type="submit">Добавить</button>
+                <div id="model-action-buttons">
+                    <button id="model-save-button" type="button">Сохранить</button>
+                    <button id="model-cancel-button" type="button">Отменить</button>
+                </div>
+                <button id="model-add-button" type="submit">Добавить</button>
             </form>
         </div>
         <div style="margin-bottom: 10px;">
@@ -338,8 +346,11 @@
                     <label for="ofd-title">Название ОФД</label>
                     <input type="text" id="ofd-title" placeholder="Название ОФД" required>
                 </div>
-
-                <button type="submit">Добавить</button>
+                <div id="ofd-action-buttons">
+                    <button id="ofd-save-button" type="button">Сохранить</button>
+                    <button id="ofd-cancel-button" type="button">Отменить</button>
+                </div>
+                <button id="ofd-add-button" type="submit">Добавить</button>
             </form>
         </div>
         <div style="margin-bottom: 10px;">
@@ -357,7 +368,11 @@
                     <label for="taxation-system-title">Название налоговой системы</label>
                     <input type="text" id="taxation-system-title" placeholder="Название налоговой системы" required>
                 </div>
-                <button type="submit">Добавить</button>
+                <div id="taxation-system-action-buttons">
+                    <button id="taxation-system-save-button" type="button">Сохранить</button>
+                    <button id="taxation-system-cancel-button" type="button">Отменить</button>
+                </div>
+                <button id="taxation-system-add-button" type="submit">Добавить</button>
             </form>
         </div>
         <div style="margin-bottom: 10px;">

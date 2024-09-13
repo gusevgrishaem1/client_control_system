@@ -28,6 +28,11 @@ public class TaxationSystemController {
         taxationSystemService.update(taxationSystem);
     }
 
+    @PutMapping("/recover")
+    public void recover(@RequestParam Long id) {
+        taxationSystemService.recover(id);
+    }
+
     @DeleteMapping
     public void delete(@RequestParam Long id) {
         taxationSystemService.delete(id);

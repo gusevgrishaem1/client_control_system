@@ -11,6 +11,8 @@ public interface OFDService {
 
     void delete(Long id);
 
+    void recover(Long id);
+
     List<OFD> getAll();
 
     List<OFD> getCombo();

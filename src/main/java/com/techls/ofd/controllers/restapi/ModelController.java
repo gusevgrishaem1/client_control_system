@@ -33,6 +33,11 @@ public class ModelController {
         modelService.update(model);
     }
 
+    @PutMapping("/recover")
+    public void recover(@RequestParam Long id) {
+        modelService.recover(id);
+    }
+
     @DeleteMapping
     public void archive(@RequestParam Long id) {
         modelService.archive(id);

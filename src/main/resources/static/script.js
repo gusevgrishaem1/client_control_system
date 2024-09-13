@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById(contentId).style.display = 'block';
             cancelClient();
             cancelCashRegister();
+            cancelModel();
+            cancelOFD();
             this.classList.add('active');
         });
     });
@@ -29,7 +31,6 @@ function loadDropdownData() {
            });
        })
        .catch(error => console.error('Error fetching clients:', error));
-
     fetch(`${backendURL}/api/models/combo`)
        .then(response => response.json())
        .then(models => {
@@ -43,7 +44,6 @@ function loadDropdownData() {
            });
        })
        .catch(error => console.error('Error fetching models:', error));
-
     fetch(`${backendURL}/api/ofds/combo`)
        .then(response => response.json())
        .then(ofds => {
@@ -57,7 +57,6 @@ function loadDropdownData() {
            });
        })
        .catch(error => console.error('Error fetching OFDs:', error));
-
        fetch(`${backendURL}/api/taxation-systems/combo`)
           .then(response => response.json())
           .then(snos => {
@@ -144,6 +143,7 @@ function archiveClient(row) {
     fetch(`${backendURL}/api/clients?id=` + data.id, {method: 'DELETE'})
     .then(() => {
         fetchAndDisplayClients();
+        loadDropdownData();
     })
     .catch(error => console.error('Error deleting client:', error));
 }
@@ -153,6 +153,7 @@ function recoverClient(row) {
     fetch(`${backendURL}/api/clients/recover?id=` + data.id, {method: 'PUT'})
     .then(() => {
         fetchAndDisplayClients();
+        loadDropdownData();
     })
     .catch(error => console.error('Error deleting client:', error));
 }
@@ -173,6 +174,7 @@ document.getElementById("client-form").addEventListener("submit", function (even
     .then(response => response.json())
     .then(newClient => {
         fetchAndDisplayClients();
+        loadDropdownData();
         resetClientForm();
     })
     .catch(error => console.error('Error adding client:', error));
@@ -204,6 +206,7 @@ function saveClient() {
         })
         .then(response => {
             fetchAndDisplayClients();
+            loadDropdownData();
             cancelClient();
         })
         .catch(error => console.error('Error adding client:', error));
@@ -287,6 +290,7 @@ function archiveCashRegister(row) {
     var data = row.getData();
     fetch(`${backendURL}/api/cash-registers?id=` + data.id, {method: 'DELETE'})
     .then(() => {
+        loadDropdownData();
         fetchAndDisplayCashRegisters();
     })
     .catch(error => console.error('Error archiving cash register:', error));
@@ -296,6 +300,7 @@ function recoverCashRegister(row) {
     var data = row.getData();
     fetch(`${backendURL}/api/cash-registers/recover?id=` + data.id, {method: 'PUT'})
     .then(() => {
+        loadDropdownData();
         fetchAndDisplayCashRegisters();
     })
     .catch(error => console.error('Error recovering cash register:', error));
@@ -335,6 +340,7 @@ document.getElementById("cash-register-form").addEventListener("submit", functio
     .then(response => response.json())
     .then(newCashRegister => {
         fetchAndDisplayCashRegisters();
+        loadDropdownData();
         cancelCashRegister();
     })
     .catch(error => console.error('Error adding cash register:', error));
@@ -369,15 +375,14 @@ function saveCashRegister() {
         fetch(url, {method: method, headers: {'Content-Type': 'application/json'}, body: json})
         .then(response => {
             fetchAndDisplayCashRegisters();
+            loadDropdownData();
             cancelCashRegister();
         })
         .catch(error => console.error('Error saving cash register:', error))
     }
 }
 
-document.getElementById('cash-save-button').addEventListener('click', function() {
-    saveCashRegister();
-});
+
 
 function cancelCashRegister() {
     editingRow = null;
@@ -415,13 +420,9 @@ document.getElementById('cash-cancel-button').addEventListener('click', function
     cancelCashRegister();
 });
 
-function resetCashRegisterForm() {
-    document.getElementById('cash-register-form').reset();
-    editingRow = null;
-    document.getElementById('cash-save-button').style.display = 'none';
-    document.getElementById('cash-cancel-button').style.display = 'none';
-    document.getElementById('cash-register-add-button').style.display = 'inline-block';
-}
+document.getElementById('cash-save-button').addEventListener('click', function() {
+    saveCashRegister();
+});
 
 function fetchAndDisplayCashRegisters() {
     fetch(`${backendURL}/api/cash-registers`)
@@ -441,25 +442,457 @@ function fetchAndDisplayClients() {
     .catch(error => console.error('Error fetching clients:', error));
 }
 
+var tableModel = new Tabulator("#model-table", {
+    layout: "fitColumns",
+    pagination: true,
+    paginationSize: 15,
+    columns: [
+        {title: "ID", field: "id", hozAlign: "center", width: 70, headerFilter: "input"},
+        {title: "Название модели", field: "title", editor: "input", width: 250, headerFilter: "input"},
+        {title: "Архив", field: "archive", visible: false}
+    ],
+    rowContextMenu:[
+         {
+             label: "Редактировать",
+             action: function(e, row) {
+                 editModel(row);
+             }
+         },
+         {
+             label: "Архивировать",
+             action: function(e, row) {
+                 archiveModel(row);
+             }
+         },
+         {
+             label: "Восстановить",
+             action: function(e, row) {
+                 recoverModel(row);
+             }
+         }
+    ],
+    addRowPos: "top",
+});
+
+function editModel(row) {
+    editingRow = row;
+    var data = row.getData();
+    document.getElementById('model-title').value = data.title;
+    document.getElementById('model-save-button').style.display = 'inline-block';
+    document.getElementById('model-cancel-button').style.display = 'inline-block';
+    document.getElementById('model-add-button').style.display = 'none';
+}
+
+function archiveModel(row) {
+    var data = row.getData();
+    fetch(`${backendURL}/api/models?id=` + data.id, {method: 'DELETE'})
+    .then(() => {
+        loadDropdownData();
+        fetchAndDisplayModels();
+    })
+    .catch(error => console.error('Error archiving model:', error));
+}
+
+function recoverModel(row) {
+    var data = row.getData();
+    fetch(`${backendURL}/api/models/recover?id=` + data.id, {method: 'PUT'})
+    .then(() => {
+        loadDropdownData();
+        fetchAndDisplayModels();
+    })
+    .catch(error => console.error('Error recovering model:', error));
+}
+
+function fetchAndDisplayModels() {
+    fetch(`${backendURL}/api/models`)
+    .then(response => response.json())
+    .then(data => {
+        tableModel.setData(data);
+    })
+    .catch(error => console.error('Error fetching models:', error));
+}
+
+function filterModelTable(showArchived) {
+    if (showArchived) {
+        tableModel.setFilter("archive", "=", true);
+    } else {
+        tableModel.setFilter("archive", "=", false);
+    }
+}
+
+function saveModel() {
+    if (editingRow) {
+        var data = editingRow.getData()
+        var id = data.id
+        var archive = data.archive
+        var title = document.getElementById('model-title').value;
+        var method = 'PUT';
+        var url = `${backendURL}/api/models`;
+        var json = JSON.stringify({title, id, archive});
+        fetch(url, {
+            method: method,
+            headers: {'Content-Type': 'application/json'},
+            body: json})
+        .then(response => {
+            fetchAndDisplayModels();
+            loadDropdownData();
+            cancelModel();
+        })
+        .catch(error => console.error('Error adding cash register:', error));
+    }
+}
+
+function cancelModel() {
+    editingRow = null;
+    document.getElementById('model-form').reset();
+    document.getElementById('model-save-button').style.display = 'none';
+    document.getElementById('model-cancel-button').style.display = 'none';
+    document.getElementById('model-add-button').style.display = 'inline-block';
+}
+
+document.getElementById("model-form").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    var title = document.getElementById('model-title').value;
+
+    var method = 'POST';
+    var url = `${backendURL}/api/models`;
+    var json = JSON.stringify({title});
+
+    fetch(url, {
+        method: method,
+        headers: {'Content-Type': 'application/json'},
+        body: json})
+    .then(response => response.json())
+    .then(model => {
+        fetchAndDisplayModels();
+        loadDropdownData();
+        cancelModel();
+    })
+    .catch(error => console.error('Error adding cash register:', error));
+});
+
+document.getElementById("model-showArchived").addEventListener("click", function() {
+    filterModelTable(true);
+});
+
+document.getElementById("model-showNotArchived").addEventListener("click", function() {
+    filterModelTable(false);
+});
+
+document.getElementById('model-cancel-button').addEventListener('click', function() {
+    cancelModel();
+});
+
+document.getElementById('model-save-button').addEventListener('click', function() {
+    saveModel();
+});
+
+var tableOfd = new Tabulator("#ofd-table", {
+    layout: "fitColumns",
+    pagination: true,
+    paginationSize: 15,
+    columns: [
+        {title: "ID", field: "id", hozAlign: "center", width: 70, headerFilter: "input"},
+        {title: "Название ОФД", field: "title", editor: "input", width: 250, headerFilter: "input"},
+        {title: "ИНН", field: "inn", editor: "input", width: 150, headerFilter: "input"},
+        {title: "Архив", field: "archive", visible: false}
+    ],
+    rowContextMenu:[
+         {
+             label: "Редактировать",
+             action: function(e, row) {
+                 editOFD(row);
+             }
+         },
+         {
+             label: "Архивировать",
+             action: function(e, row) {
+                 archiveOFD(row);
+             }
+         },
+         {
+             label: "Восстановить",
+             action: function(e, row) {
+                 recoverOFD(row);
+             }
+         }
+    ],
+    addRowPos: "top",
+});
+
+function editOFD(row) {
+    editingRow = row;
+    var data = row.getData();
+    document.getElementById('ofd-title').value = data.title;
+    document.getElementById('ofd-inn').value = data.inn;
+    document.getElementById('ofd-save-button').style.display = 'inline-block';
+    document.getElementById('ofd-cancel-button').style.display = 'inline-block';
+    document.getElementById('ofd-add-button').style.display = 'none';
+}
+
+function archiveOFD(row) {
+    var data = row.getData();
+    fetch(`${backendURL}/api/ofds?id=` + data.id, {method: 'DELETE'})
+    .then(() => {
+        loadDropdownData();
+        fetchAndDisplayOFDs();
+    })
+    .catch(error => console.error('Error archiving OFD:', error));
+}
+
+function recoverOFD(row) {
+    var data = row.getData();
+    fetch(`${backendURL}/api/ofds/recover?id=` + data.id, {method: 'PUT'})
+    .then(() => {
+        loadDropdownData();
+        fetchAndDisplayOFDs();
+    })
+    .catch(error => console.error('Error recovering OFD:', error));
+}
+
+function fetchAndDisplayOFDs() {
+    fetch(`${backendURL}/api/ofds`)
+    .then(response => response.json())
+    .then(data => {
+        tableOfd.setData(data);
+    })
+    .catch(error => console.error('Error fetching OFDs:', error));
+}
+
+function filterOFDTable(showArchived) {
+    if (showArchived) {
+        tableOfd.setFilter("archive", "=", true);
+    } else {
+        tableOfd.setFilter("archive", "=", false);
+    }
+}
+
+function saveOFD() {
+    if (editingRow) {
+        var data = editingRow.getData();
+        var id = data.id;
+        var archive = data.archive;
+        var title = document.getElementById('ofd-title').value;
+        var inn = document.getElementById('ofd-inn').value;
+        var method = 'PUT';
+        var url = `${backendURL}/api/ofds`;
+        var json = JSON.stringify({title, inn, id, archive});
+        fetch(url, {
+            method: method,
+            headers: {'Content-Type': 'application/json'},
+            body: json})
+        .then(response => {
+            fetchAndDisplayOFDs();
+            loadDropdownData();
+            cancelOFD();
+        })
+        .catch(error => console.error('Error saving OFD:', error));
+    }
+}
+
+function cancelOFD() {
+    editingRow = null;
+    document.getElementById('ofd-form').reset();
+    document.getElementById('ofd-save-button').style.display = 'none';
+    document.getElementById('ofd-cancel-button').style.display = 'none';
+    document.getElementById('ofd-add-button').style.display = 'inline-block';
+}
+
+document.getElementById("ofd-form").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    var title = document.getElementById('ofd-title').value;
+    var inn = document.getElementById('ofd-inn').value;
+
+    var method = 'POST';
+    var url = `${backendURL}/api/ofds`;
+    var json = JSON.stringify({title, inn});
+
+    fetch(url, {
+        method: method,
+        headers: {'Content-Type': 'application/json'},
+        body: json})
+    .then(response => response.json())
+    .then(ofd => {
+        fetchAndDisplayOFDs();
+        loadDropdownData();
+        cancelOFD();
+    })
+    .catch(error => console.error('Error adding OFD:', error));
+});
+
+document.getElementById("ofd-showArchived").addEventListener("click", function() {
+    filterOFDTable(true);
+});
+
+document.getElementById("ofd-showNotArchived").addEventListener("click", function() {
+    filterOFDTable(false);
+});
+
+document.getElementById('ofd-cancel-button').addEventListener('click', function() {
+    cancelOFD();
+});
+
+document.getElementById('ofd-save-button').addEventListener('click', function() {
+    saveOFD();
+});
+
+var tableTaxationSystem = new Tabulator("#taxation-system-table", {
+    layout: "fitColumns",
+    pagination: true,
+    paginationSize: 15,
+    columns: [
+        {title: "ID", field: "id", hozAlign: "center", width: 70, headerFilter: "input"},
+        {title: "Название системы налогообложения", field: "title", editor: "input", width: 250, headerFilter: "input"},
+        {title: "Архив", field: "archive", visible: false}
+    ],
+    rowContextMenu:[
+         {
+             label: "Редактировать",
+             action: function(e, row) {
+                 editTaxationSystem(row);
+             }
+         },
+         {
+             label: "Архивировать",
+             action: function(e, row) {
+                 archiveTaxationSystem(row);
+             }
+         },
+         {
+             label: "Восстановить",
+             action: function(e, row) {
+                 recoverTaxationSystem(row);
+             }
+         }
+    ],
+    addRowPos: "top",
+});
+
+function editTaxationSystem(row) {
+    editingRow = row;
+    var data = row.getData();
+    document.getElementById('taxation-system-title').value = data.title;
+    document.getElementById('taxation-system-save-button').style.display = 'inline-block';
+    document.getElementById('taxation-system-cancel-button').style.display = 'inline-block';
+    document.getElementById('taxation-system-add-button').style.display = 'none';
+}
+
+function archiveTaxationSystem(row) {
+    var data = row.getData();
+    fetch(`${backendURL}/api/taxation-systems?id=` + data.id, {method: 'DELETE'})
+    .then(() => {
+        loadDropdownData();
+        fetchAndDisplayTaxationSystems();
+    })
+    .catch(error => console.error('Error archiving taxation system:', error));
+}
+
+function recoverTaxationSystem(row) {
+    var data = row.getData();
+    fetch(`${backendURL}/api/taxation-systems/recover?id=` + data.id, {method: 'PUT'})
+    .then(() => {
+        loadDropdownData();
+        fetchAndDisplayTaxationSystems();
+    })
+    .catch(error => console.error('Error recovering taxation system:', error));
+}
+
+function fetchAndDisplayTaxationSystems() {
+    fetch(`${backendURL}/api/taxation-systems`)
+    .then(response => response.json())
+    .then(data => {
+        tableTaxationSystem.setData(data);
+    })
+    .catch(error => console.error('Error fetching taxation systems:', error));
+}
+
+function filterTaxationSystemTable(showArchived) {
+    if (showArchived) {
+        tableTaxationSystem.setFilter("archive", "=", true);
+    } else {
+        tableTaxationSystem.setFilter("archive", "=", false);
+    }
+}
+
+function saveTaxationSystem() {
+    if (editingRow) {
+        var data = editingRow.getData();
+        var id = data.id;
+        var archive = data.archive;
+        var title = document.getElementById('taxation-system-title').value;
+        var method = 'PUT';
+        var url = `${backendURL}/api/taxation-systems`;
+        var json = JSON.stringify({title, id, archive});
+        fetch(url, {
+            method: method,
+            headers: {'Content-Type': 'application/json'},
+            body: json})
+        .then(response => {
+            fetchAndDisplayTaxationSystems();
+            loadDropdownData();
+            cancelTaxationSystem();
+        })
+        .catch(error => console.error('Error saving taxation system:', error));
+    }
+}
+
+function cancelTaxationSystem() {
+    editingRow = null;
+    document.getElementById('taxation-system-form').reset();
+    document.getElementById('taxation-system-save-button').style.display = 'none';
+    document.getElementById('taxation-system-cancel-button').style.display = 'none';
+    document.getElementById('taxation-system-add-button').style.display = 'inline-block';
+}
+
+document.getElementById("taxation-system-form").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    var title = document.getElementById('taxation-system-title').value;
+
+    var method = 'POST';
+    var url = `${backendURL}/api/taxation-systems`;
+    var json = JSON.stringify({title});
+
+    fetch(url, {
+        method: method,
+        headers: {'Content-Type': 'application/json'},
+        body: json})
+    .then(response => response.json())
+    .then(taxationSystem => {
+        fetchAndDisplayTaxationSystems();
+        loadDropdownData();
+        cancelTaxationSystem();
+    })
+    .catch(error => console.error('Error adding taxation system:', error));
+});
+
+document.getElementById("taxation-system-showArchived").addEventListener("click", function() {
+    filterTaxationSystemTable(true);
+});
+
+document.getElementById("taxation-system-showNotArchived").addEventListener("click", function() {
+    filterTaxationSystemTable(false);
+});
+
+document.getElementById('taxation-system-cancel-button').addEventListener('click', function() {
+    cancelTaxationSystem();
+});
+
+document.getElementById('taxation-system-save-button').addEventListener('click', function() {
+    saveTaxationSystem();
+});
+
 fetchAndDisplayCashRegisters();
 fetchAndDisplayClients();
+fetchAndDisplayModels();
+fetchAndDisplayOFDs();
+fetchAndDisplayTaxationSystems();
 
-//document.addEventListener('DOMContentLoaded', function () {
-//    const searchInput = document.getElementById('cash-client-search');
-//    const selectElement = document.getElementById('cash-client-select');
-//
-//    searchInput.addEventListener('keyup', function () {
-//        const searchTerm = searchInput.value.toLowerCase();
-//
-//        for (let i = 0; i < selectElement.options.length; i++) {
-//            const optionText = selectElement.options[i].text.toLowerCase();
-//            if (optionText.includes(searchTerm)) {
-//                selectElement.options[i].style.display = '';
-//            } else {
-//                selectElement.options[i].style.display = 'none';
-//            }
-//        }
-//    });
-//});
-
+filterModelTable(false);
+filterOFDTable(false);
+filterClientTable(false);
+filterCashRegisterTable(false);
+filterTaxationSystemTable(false);
 

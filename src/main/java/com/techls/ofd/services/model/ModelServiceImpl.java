@@ -18,6 +18,7 @@ public class ModelServiceImpl implements ModelService {
     @Override
     @Transactional
     public Long create(Model model) {
+        model.setArchive(false);
         return modelRepository.save(model).getId();
     }
 
@@ -43,6 +44,23 @@ public class ModelServiceImpl implements ModelService {
                 }
         );
     }
+
+    @Override
+    public void recover(Long id) {
+        cashRegisterRepository.findByModel_Id(id).forEach(
+                cashRegister -> {
+                    cashRegister.setArchive(false);
+                    cashRegisterRepository.save(cashRegister);
+                }
+        );
+        modelRepository.findById(id).ifPresent(
+                model -> {
+                    model.setArchive(false);
+                    modelRepository.save(model);
+                }
+        );
+    }
+
 
     @Override
     public List<Model> getAll() {

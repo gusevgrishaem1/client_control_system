@@ -35,3 +35,15 @@ left join taxation_system ts on ts.id = c.taxation_system_id
 left join fiscal_memory fm on fm.cashbox_id = c.id
 left join fiscal_data_operator_agreement fdoa on fdoa.cashbox_id = c.id
 left join firmware f on f.cashbox_id = c.id;
+
+UPDATE ofd_data_seq
+SET next_val = COALESCE((SELECT MAX(id) FROM ofd_data), 1);
+UPDATE taxation_system_data_seq
+SET next_val = COALESCE((SELECT MAX(id) FROM taxation_system_data), 1);
+UPDATE client_data_seq
+SET next_val = COALESCE((SELECT MAX(id) FROM client_data), 1);
+UPDATE model_data_seq
+SET next_val = COALESCE((SELECT MAX(id) FROM model_data), 1);
+UPDATE cash_register_data_seq
+SET next_val = COALESCE((SELECT MAX(id) FROM cash_register_data), 1);
+

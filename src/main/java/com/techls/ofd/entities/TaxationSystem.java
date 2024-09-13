@@ -16,7 +16,7 @@ import lombok.Setter;
 // Система налогооблажения
 public class TaxationSystem {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id")
     private Long id;
     @Column(name = "title")
