@@ -678,6 +678,14 @@ function fetchAndDisplayOFDs() {
     .catch(error => console.error('Error fetching OFDs:', error));
 }
 
+function filterClientTable(showArchived) {
+    if (showArchived) {
+        tableClient.setFilter("archive", "=", true);
+    } else {
+        tableClient.setFilter("archive", "=", false);
+    }
+}
+
 function filterOFDTable(showArchived) {
     if (showArchived) {
         tableOfd.setFilter("archive", "=", true);

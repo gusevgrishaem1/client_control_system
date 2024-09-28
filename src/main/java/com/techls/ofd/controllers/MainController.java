@@ -3,35 +3,36 @@ package com.techls.ofd.controllers;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.SneakyThrows;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 @Controller
 public class MainController {
-    @SneakyThrows
     @GetMapping("/login-page")
     @ResponseBody
-    public String showLoginPage() {
-        ClassPathResource resource = new ClassPathResource("static/login.html");
-        Path filePath = resource.getFile().toPath();
-        return Files.readString(filePath);
+    public String showLoginPage() throws Exception {
+        Resource resource = new ClassPathResource("static/login.html");
+        try (InputStream inputStream = resource.getInputStream()) {
+            return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+        }
     }
 
-    @SneakyThrows
-    @GetMapping
+    @GetMapping("/")
     @ResponseBody
-    public String showIndexPage() {
-        ClassPathResource resource = new ClassPathResource("static/index.html");
-        Path filePath = resource.getFile().toPath();
-        return Files.readString(filePath);
+    public String showIndexPage() throws Exception {
+        Resource resource = new ClassPathResource("static/index.html");
+        try (InputStream inputStream = resource.getInputStream()) {
+            return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+        }
     }
 
     @PostMapping("/logout")
