@@ -3,9 +3,10 @@ package com.techls.ofd.configs;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,19 +28,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests((authorize) -> authorize
-                        .anyRequest().authenticated()
-                )
-                .httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults());
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/login-page").permitAll()
+                        .anyRequest().authenticated())
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .csrf(CsrfConfigurer::disable)
+                .formLogin(
+                        form -> form
+                                .loginPage("/login-page")
+                                .loginProcessingUrl("/login")
+                                .usernameParameter("username")
+                                .passwordParameter("password")
+                                .defaultSuccessUrl("/")
+                                .failureUrl("/login-page")
+                                .permitAll()
+                ).logout(
+                        logout -> logout
+                                .logoutUrl("/logout")
+                                .logoutSuccessUrl("/login-page")
+                                .permitAll()
+                );
         return http.build();
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails userDetails = User.withUserDetails(
-                User.builder().username(adminUsername).password(passwordEncoder().encode(adminPassword)).build()
-        ).build();
+        UserDetails userDetails = User.builder()
+                .username(adminUsername)
+                .password(passwordEncoder().encode(adminPassword))
+                .roles("ADMIN")
+                .build();
         return new InMemoryUserDetailsManager(userDetails);
     }
 

@@ -18,6 +18,7 @@ public class TaxationSystemServiceImpl implements TaxationSystemService {
     @Override
     @Transactional
     public Long create(TaxationSystem taxationSystem) {
+        taxationSystem.setArchive(false);
         return taxationSystemRepository.save(taxationSystem).getId();
     }
 
@@ -69,7 +70,7 @@ public class TaxationSystemServiceImpl implements TaxationSystemService {
     public List<TaxationSystem> getCombo() {
         return taxationSystemRepository.findAll()
                 .stream()
-                .filter(el -> !el.getArchive())
+                .filter(el -> el.getArchive() == null || !el.getArchive())
                 .filter(el -> el.getTitle() != null).toList();
     }
 

@@ -12,6 +12,16 @@ document.addEventListener('DOMContentLoaded', function() {
             cancelCashRegister();
             cancelModel();
             cancelOFD();
+            fetchAndDisplayCashRegisters();
+            fetchAndDisplayClients();
+            fetchAndDisplayModels();
+            fetchAndDisplayOFDs();
+            fetchAndDisplayTaxationSystems();
+            filterModelTable(false);
+            filterOFDTable(false);
+            filterClientTable(false);
+            filterCashRegisterTable(false);
+            filterTaxationSystemTable(false);
             this.classList.add('active');
         });
     });
@@ -75,6 +85,8 @@ function loadDropdownData() {
 loadDropdownData();
 
 var tableClient = new Tabulator("#client-table", {
+    locale: true, // Включение локализации
+    initialLocale: "ru", // Установка локали по умолчанию на русский
   layout: "fitColumns",
   pagination: true,
   paginationSize: 15,
@@ -226,6 +238,8 @@ var tableCashRegister = new Tabulator("#cash-register-table", {
     layout: "fitColumns",
     pagination: true,
     paginationSize: 15,
+    locale: true, // Включение локализации
+    initialLocale: "ru", // Установка локали по умолчанию на русский
     columns: [
         {title: "ID", field: "id", hozAlign: "center", width: 70, headerFilter: "input"},
         {title: "Клиент", field: "clientTitle", hozAlign: "center", editor: "input", width: 200, headerFilter: "input"},
@@ -445,6 +459,8 @@ function fetchAndDisplayClients() {
 var tableModel = new Tabulator("#model-table", {
     layout: "fitColumns",
     pagination: true,
+    locale: true, // Включение локализации
+    initialLocale: "ru", // Установка локали по умолчанию на русский
     paginationSize: 15,
     columns: [
         {title: "ID", field: "id", hozAlign: "center", width: 70, headerFilter: "input"},
@@ -592,6 +608,8 @@ var tableOfd = new Tabulator("#ofd-table", {
     layout: "fitColumns",
     pagination: true,
     paginationSize: 15,
+    locale: true, // Включение локализации
+    initialLocale: "ru", // Установка локали по умолчанию на русский
     columns: [
         {title: "ID", field: "id", hozAlign: "center", width: 70, headerFilter: "input"},
         {title: "Название ОФД", field: "title", editor: "input", width: 250, headerFilter: "input"},
@@ -742,6 +760,8 @@ var tableTaxationSystem = new Tabulator("#taxation-system-table", {
     layout: "fitColumns",
     pagination: true,
     paginationSize: 15,
+    locale: true, // Включение локализации
+    initialLocale: "ru", // Установка локали по умолчанию на русский
     columns: [
         {title: "ID", field: "id", hozAlign: "center", width: 70, headerFilter: "input"},
         {title: "Название системы налогообложения", field: "title", editor: "input", width: 250, headerFilter: "input"},
@@ -884,12 +904,28 @@ document.getElementById('taxation-system-save-button').addEventListener('click',
     saveTaxationSystem();
 });
 
+document.getElementById('logoutButton').addEventListener('click', function() {
+    fetch('/logout', {
+        method: 'POST',
+        credentials: 'same-origin' // Отправляем сессионные куки, если они нужны
+    })
+    .then(response => {
+        if (response.ok) {
+            // Перенаправляем на страницу логина после успешного выхода
+            window.location.href = '/login-page';
+        } else {
+            console.error('Ошибка при выходе');
+        }
+    })
+    .catch(error => console.error('Ошибка:', error));
+});
+
+
 fetchAndDisplayCashRegisters();
 fetchAndDisplayClients();
 fetchAndDisplayModels();
 fetchAndDisplayOFDs();
 fetchAndDisplayTaxationSystems();
-
 filterModelTable(false);
 filterOFDTable(false);
 filterClientTable(false);
