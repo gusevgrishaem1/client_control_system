@@ -16,7 +16,8 @@ import lombok.Setter;
 // Клиент
 public class Client {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_seq")
+    @SequenceGenerator(name = "client_seq", sequenceName = "client_data_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
     @Column(name = "inn")

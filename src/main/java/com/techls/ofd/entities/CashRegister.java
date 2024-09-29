@@ -19,7 +19,8 @@ import java.time.LocalDate;
 public class CashRegister {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cash_register_seq")
+    @SequenceGenerator(name = "cash_register_seq", sequenceName = "cash_register_data_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 

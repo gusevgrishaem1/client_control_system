@@ -15,7 +15,8 @@ import lombok.Setter;
 // Оператор фискальных данных
 public class OFD {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ofd_seq")
+    @SequenceGenerator(name = "ofd_seq", sequenceName = "ofd_data_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
     @Column(name = "title")
