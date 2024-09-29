@@ -84,6 +84,15 @@ function loadDropdownData() {
 
 loadDropdownData();
 
+  $(document).ready(function() {
+    $('#cash-client-select').select2({
+      placeholder: 'Выберите клиента',  // Плейсхолдер
+      allowClear: true,                 // Кнопка очистки
+      minimumResultsForSearch: 10,      // Включает поиск при 10 и более опциях
+      width: '100%'                     // Задает ширину для выпадашки
+    });
+  });
+
 var tableClient = new Tabulator("#client-table", {
     locale: true, // Включение локализации
     initialLocale: "ru", // Установка локали по умолчанию на русский
@@ -187,7 +196,7 @@ document.getElementById("client-form").addEventListener("submit", function (even
     .then(newClient => {
         fetchAndDisplayClients();
         loadDropdownData();
-        resetClientForm();
+        cancelClient();
     })
     .catch(error => console.error('Error adding client:', error));
 });
